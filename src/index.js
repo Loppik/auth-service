@@ -9,6 +9,9 @@ app.use(cors());
 
 const { sequelize } = require('./sequelize');
 
+const router = require('./modules');
+app.use(router);
+
 app.listen(config.port, () => {
   console.log(`Server listening on http://${config.host}:${config.port}`);
 })
