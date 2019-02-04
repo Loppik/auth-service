@@ -25,6 +25,7 @@ exports.addSite = siteName => {
     },
     {
       freezeTableName: true,
+      timestamps: false,
     }
   );
   siteTable.sync();
