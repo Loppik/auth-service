@@ -1,12 +1,14 @@
 const userRequest = require('../../user/db/user-db');
 const crypto = require('../../../crypto');
+const tokenService = require('../../token/services/token-service');
 
 exports.login = async (siteName, user) => {
   const u = (await userRequest.getUserByEmail(siteName, user.email)).rows[0];
   if (u) {
     const isEqual = await crypto.compare(user.password, u.password);
     if (isEqual) {
-      return 'token';
+      const accessToken = await tokenService.generateToken({ userId: u.user_id });
+      return accessToken;
     } else {
       return Promise.reject(new Error('Incorrect password'));
     }

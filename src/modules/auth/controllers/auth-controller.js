@@ -1,12 +1,10 @@
 const authService = require('../services/auth-service');
 
-const crypto = require('../../../crypto');
-
 exports.login = async (req, res) => {
   try {
     const siteName = req.baseUrl.slice(1); // FIXME: add interceptor for adding site name to body
-    const data = await authService.login(siteName, req.body.user)
-    res.send(data);
+    const accessToken = await authService.login(siteName, req.body.user)
+    res.send({ accessToken });
   } catch (err) {
     res.status(500);
     res.send({ msg: 'Login failed', err: err.message });
