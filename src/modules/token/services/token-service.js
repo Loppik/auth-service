@@ -1,12 +1,19 @@
 const jwt = require('jsonwebtoken');
-const config = require('../../../configs/jwt');
 
-exports.generateToken = obj => {
+exports.generateToken = (obj, secretKey, expiresIn) => {
   return new Promise((resolve, reject) => {
-    jwt.sign(obj, config.secretKey, { expiresIn: config.expiresIn }, (err, token) => err ? (
+    jwt.sign(obj, secretKey, { expiresIn }, (err, token) => err ? (
       reject(new Error('Token generation error'))
     ) : (
       resolve(token)
     ));
+  });
+};
+
+exports.verifyToken = (token, secretKey) => {
+  return jwt.verify(token, secretKey, (err, decoder) => {
+    if (!err) {
+      return decoder;
+    }
   });
 };

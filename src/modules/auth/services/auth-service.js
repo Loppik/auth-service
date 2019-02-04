@@ -1,14 +1,16 @@
 const userRequest = require('../../user/db/user-db');
 const crypto = require('../../../crypto');
 const tokenService = require('../../token/services/token-service');
+const config = require('../../../configs/jwt');
 
 exports.login = async (siteName, user) => {
   const u = (await userRequest.getUserByEmail(siteName, user.email)).rows[0];
   if (u) {
     const isEqual = await crypto.compare(user.password, u.password);
     if (isEqual) {
-      const accessToken = await tokenService.generateToken({ userId: u.user_id });
-      return accessToken;
+      const accessToken = await tokenService.generateToken({ userId: u.user_id }, config.secretKey, config.expiresIn); // FIXME: copy-past
+      const refreshToken = await tokenService.generateToken({ userId: u.user_id }, config.rsecretKey, config.rexpireIn);
+      return { accessToken, refreshToken };
     } else {
       return Promise.reject(new Error('Incorrect password'));
     }
@@ -23,5 +25,16 @@ exports.registration = async (siteName, user) => {
     return Promise.reject(new Error('This e-mail already exist'))
   } else {
     return userRequest.addUser(siteName, { ...user, password: await crypto.createHash(user.password) });
+  }
+};
+
+exports.refreshTokens = async refreshToken => {
+  const decode = await tokenService.verifyToken(refreshToken, config.rsecretKey);
+  if (decode) {
+    const newAccessToken = tokenService.generateToken({ userId: decode.userId }, config.secretKey, config.expiresIn); // FIXME: copy-past
+    const newRefreshToken = tokenService.generateToken({ userId: decode.userId }, config.rsecretKey, config.rexpireIn);
+    return { newAccessToken, newRefreshToken }
+  } else {
+    return Promise.reject(new Error('Refresh token expired'));
   }
 };
