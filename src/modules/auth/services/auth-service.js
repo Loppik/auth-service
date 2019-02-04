@@ -1,4 +1,5 @@
 const userRequest = require('../../user/db/user-db');
+const crypto = require('../../../crypto');
 //const bcrypt = require('bcryptjs');
 
 exports.registration = async (siteName, user) => {
@@ -6,7 +7,6 @@ exports.registration = async (siteName, user) => {
   if (u) {
     return Promise.reject(new Error('This e-mail already exist'))
   } else {
-    //userRequest.addUser({ ...user, password: await bcrypt.hash(user.password, 10) })
-    return userRequest.addUser(siteName, { ...user, password: user.password })
+    return userRequest.addUser(siteName, { ...user, password: await crypto.createHash(user.password) });
   }
 };
