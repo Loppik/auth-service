@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const config = require('./configs/crypto');
 
-exports.createHash = text => {
+const createHash = text => {
   return new Promise((resolve, reject) => {
     const hmac = crypto.createHmac(config.algorithm, config.secretKey);
     hmac.setEncoding('hex');
@@ -10,3 +10,18 @@ exports.createHash = text => {
     });
   })
 }
+
+const compare = (text, comparedHashText) => {
+  return new Promise((resolve, reject) => {
+    createHash(text)
+    .then((hashText) => {
+      if (hashText === comparedHashText) {
+        resolve(true);
+      } else {
+        resolve(false);
+      }
+    })
+  });
+}
+
+module.exports = { createHash, compare };
