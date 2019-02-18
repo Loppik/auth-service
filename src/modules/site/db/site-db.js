@@ -1,32 +1,3 @@
-const { sequelize, Sequelize } = require('../../../sequelize');
+const db = require('../../../pg');
 
-exports.addSite = siteName => {
-  const siteTable = sequelize.define(
-    siteName,
-    {
-      user_id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        unique: true,
-        autoIncrement: true
-      },
-      email: {
-        type: Sequelize.STRING(50),
-        unique: true,
-        allowNull: false,
-        validate: {
-          isEmail: true,
-        }
-      },
-      password: {
-        type: Sequelize.STRING(50),
-        allowNull: false
-      },
-    },
-    {
-      freezeTableName: true,
-      timestamps: false,
-    }
-  );
-  siteTable.sync();
-}
+exports.addSite = siteName => db.query(`CREATE TABLE ${siteName} (user_id SERIAL, email VARCHAR(50) UNIQUE NOT NULL, password VARCHAR(50) NOT NULL)`);
