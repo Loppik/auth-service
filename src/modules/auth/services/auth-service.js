@@ -5,7 +5,7 @@ const tokenRequest = require('../../token/db/token-db');
 const config = require('../../../configs/jwt');
 
 exports.login = async (siteName, user) => {
-  const u = (await userRequest.getUserByEmail(siteName, user.email)).rows[0];
+  const u = await userRequest.getUserByEmail(siteName, user.email);
   if (u) {
     const isEqual = await crypto.compare(user.password, u.password);
     if (isEqual) {
@@ -22,7 +22,7 @@ exports.login = async (siteName, user) => {
 };
 
 exports.registration = async (siteName, user) => {
-  const u = (await userRequest.getUserByEmail(siteName, user.email)).rows[0];
+  const u = await userRequest.getUserByEmail(siteName, user.email);
   if (u) {
     return Promise.reject(new Error('This e-mail already exist'))
   } else {
@@ -31,6 +31,7 @@ exports.registration = async (siteName, user) => {
 };
 
 exports.refreshTokens = async refreshToken => {
+
   const decode = await tokenService.verifyToken(refreshToken, config.rsecretKey);
   if (decode) {
     const newAccessToken = tokenService.generateToken({ userId: decode.userId }, config.secretKey, config.expiresIn); // FIXME: copy-past
