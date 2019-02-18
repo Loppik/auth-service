@@ -30,13 +30,17 @@ exports.registration = async (siteName, user) => {
   }
 };
 
-exports.refreshTokens = async refreshToken => {
-
+exports.refreshTokens = async (siteName, refreshToken) => {
   const decode = await tokenService.verifyToken(refreshToken, config.rsecretKey);
   if (decode) {
-    const newAccessToken = tokenService.generateToken({ userId: decode.userId }, config.secretKey, config.expiresIn); // FIXME: copy-past
-    const newRefreshToken = tokenService.generateToken({ userId: decode.userId }, config.rsecretKey, config.rexpireIn);
-    return { newAccessToken, newRefreshToken }
+    if (await tokenService.checkRefreshToken(siteName, decode.userId, refreshToken)) {
+      const newAccessToken = tokenService.generateToken({ userId: decode.userId }, config.secretKey, config.expiresIn); // FIXME: copy-past
+      const newRefreshToken = tokenService.generateToken({ userId: decode.userId }, config.rsecretKey, config.rexpireIn);
+      return { newAccessToken, newRefreshToken }
+    } else {
+      // FIXME: kick 
+      return Promise.reject(new Error('Already used refresh token'));
+    }
   } else {
     return Promise.reject(new Error('Refresh token expired'));
   }

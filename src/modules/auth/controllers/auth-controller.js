@@ -24,10 +24,11 @@ exports.registration = async (req, res) => {
 
 exports.refreshTokens = async (req, res) => {
   try {
-    const token = await authService.updateToken(req.params.refreshToken);
+    const siteName = req.baseUrl.slice(1);
+    const token = await authService.refreshTokens(siteName, req.params.refreshToken);
     res.send(token);
   } catch (err) {
     res.status(500);
-    res.send({ msg: 'Refresh token expired', err: err.message });
+    res.send({ msg: 'Refresh token error', err: err.message });
   }
 };

@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const tokenRequest = require('../db/token-db');
 
 exports.generateToken = (obj, secretKey, expiresIn) => {
   return new Promise((resolve, reject) => {
@@ -17,3 +18,9 @@ exports.verifyToken = (token, secretKey) => {
     }
   });
 };
+
+exports.checkRefreshToken = async (siteName, user_id, refreshToken) => {
+  const refTokenDB = await tokenRequest.getRefreshToken(siteName, user_id);
+  console.log(refTokenDB);
+  return refTokenDB === refreshToken;
+}
