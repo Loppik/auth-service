@@ -1,6 +1,7 @@
 const userRequest = require('../../user/db/user-db');
 const crypto = require('../../../crypto');
 const tokenService = require('../../token/services/token-service');
+const tokenRequest = require('../../token/db/token-db');
 const config = require('../../../configs/jwt');
 
 exports.login = async (siteName, user) => {
@@ -10,6 +11,7 @@ exports.login = async (siteName, user) => {
     if (isEqual) {
       const accessToken = await tokenService.generateToken({ userId: u.user_id }, config.secretKey, config.expiresIn); // FIXME: copy-past
       const refreshToken = await tokenService.generateToken({ userId: u.user_id }, config.rsecretKey, config.rexpireIn);
+      tokenRequest.addRefreshToken(siteName, u.user_id, refreshToken);
       return { accessToken, refreshToken };
     } else {
       return Promise.reject(new Error('Incorrect password'));
