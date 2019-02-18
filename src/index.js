@@ -7,8 +7,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
 app.use(cors());
 
-const { sequelize } = require('./sequelize');
-
 const router = require('./modules');
 app.use(router);
 
